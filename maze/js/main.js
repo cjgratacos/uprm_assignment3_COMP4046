@@ -311,12 +311,12 @@
         return geometry;
     }
     
-    var createFloorGeometry = function(maze) {
+    var createFloorGeometry = function(maze,materialCount) {
         var geometry = maze;//new THREE.Geometry();
         
         for (var i = 0; i < plane_dimension.w; i++) {
             for (var j = 0; j < plane_dimension.h; j++) {
-               geometry.merge(createXYTile(i,j,0,0),new THREE.Matrix4(),0);
+               geometry.merge(createXYTile(i,j,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
             }
             
         }
@@ -326,16 +326,16 @@
         //geometry.computeVertexNormals();
         return geometry;
     }
-    var createWallGeometry = function(maze) {
+    var createWallGeometry = function(maze,materialCount) {
         var geometry = maze;
         
         for (var i = 0; i < plane_dimension.w; i++) {
-            geometry.merge(createXZTile(i,0,0),new THREE.Matrix4(),0);
-            geometry.merge(createXZTile(i,plane_dimension.h,0),new THREE.Matrix4(),0);
+            geometry.merge(createXZTile(i,0,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
+            geometry.merge(createXZTile(i,plane_dimension.h,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
         }
         for (var i = 0; i < plane_dimension.h; i++) {
-            geometry.merge(createYZTile(0,i,0),new THREE.Matrix4(),0);
-            geometry.merge(createYZTile(plane_dimension.w,i,0),new THREE.Matrix4(),0);
+            geometry.merge(createYZTile(0,i,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
+            geometry.merge(createYZTile(plane_dimension.w,i,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
         }
         // TODO
         
@@ -375,12 +375,12 @@
         for (var i=0; i<glob_scene.cameras.length; i++) {
             glob_scene.camerasHelpers[i] = new THREE.CameraHelper(glob_scene.cameras[i]);
             glob_scene.camerasHelpers[i].visible = false; // Set to true to show cameras positions
-            glob_scene.scene.add( glob_scene.camerasHelpers[i] )
+            glob_scene.scene.add( glob_scene.camerasHelpers[i] );
         }
         
         glob_scene.axisHelper = new THREE.AxisHelper( 1 ); // Axis length = 2
-        glob_scene.axisHelper.material.linewidth = 7
-        glob_scene. axisHelper.position.set(0,0,0)
+        glob_scene.axisHelper.material.linewidth = 7;
+        glob_scene. axisHelper.position.set(0,0,0);
         glob_scene.scene.add( glob_scene.axisHelper );
         
 
@@ -397,7 +397,16 @@
         
         /* Load textures and create materials */
         
-        var tex_n, materials = [];
+        var texs = [], materials = [],multimaterial;
+        texs.push(THREE.ImageUtils.loadTexture("textures/crateUV.jpg"));
+        texs.push(THREE.ImageUtils.loadTexture( "textures/crateUV.jpg" ));
+        texs.push(THREE.ImageUtils.loadTexture( "textures/floor1.png" ));
+        texs.push(THREE.ImageUtils.loadTexture( "textures/brick-c.jpg " ));
+        
+        for (var k = 0; k < texs.length; k++) {
+            materials.push(new THREE.MeshPhongMaterial({map:texs[k],side:THREE.DoubleSide}));
+        }
+        multimaterial = new THREE.MeshFaceMaterial(materials);
         
         // TODO: Define materials[i] for i=0..3
 
@@ -408,14 +417,7 @@
         
         // TODO: replace uniform color by crateUV texture
         
-        var tex = THREE.ImageUtils.loadTexture("textures/crateUV.jpg");
-        material = new THREE.MeshPhongMaterial( {map: tex, side:THREE.DoubleSide } );
-        /*Debugging use*/
-        if(debug_mode.tileTest){
-         var testtile = new THREE.Mesh( geometry, material );
-         glob_scene.scene.add( testtile );   
-        }
-        
+        material = new THREE.MeshPhongMaterial( {map: texs[0], side:THREE.DoubleSide } );
         
         //material = new THREE.MeshPhongMaterial( {color: 0xff0000} ); 
         //
@@ -435,13 +437,13 @@
         //glob_scene.scene.add(glob_scene.tileMesh)
         
         // TODO: complete createFloorGeometry function
-         geometry = createFloorGeometry(new THREE.Geometry());
-         glob_scene.floorMeshmesh = new THREE.Mesh( geometry, material );
+         geometry = createFloorGeometry(new THREE.Geometry(),texs.length);
+         glob_scene.floorMeshmesh = new THREE.Mesh( geometry, multimaterial );
          glob_scene.scene.add( glob_scene.floorMeshmesh );
         
         // TODO: complete createWallGeometry function    
-        geometry = createWallGeometry(geometry);
-        glob_scene.wallMesh = new THREE.Mesh( geometry, material );
+        geometry = createWallGeometry(geometry,texs.length);
+        glob_scene.wallMesh = new THREE.Mesh( geometry, multimaterial );
         glob_scene.scene.add( glob_scene.wallMesh );
         
         // Helper to see the walls from cameras[2] top view
@@ -454,22 +456,34 @@
 
         hero.position.x = hero.position.y = 0;
         
-        geometry = new THREE.BoxGeometry(0.5,0.3,0.6);
-        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0.3));
-        geometry.merge( new THREE.SphereGeometry(0.2,20,20), new THREE.Matrix4().makeTranslation(0,0,0.8), 0 );
-        material = new THREE.MeshPhongMaterial( {color: 0xff0000} ); 
-        hero.mesh = new THREE.Mesh( geometry, material ); 
-        glob_scene.scene.add( hero.mesh );
+        //geometry = new THREE.BoxGeometry(0.5,0.3,0.6);
+        //geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0.3));
+        //geometry.merge( new THREE.SphereGeometry(0.2,20,20), new THREE.Matrix4().makeTranslation(0,0,0.8), 0 );
+        //material = new THREE.MeshPhongMaterial( {color: 0xff0000} ); 
+        //hero.mesh = new THREE.Mesh( geometry, material ); 
+        //glob_scene.scene.add( hero.mesh );
 
         // TODO: replace box and sphere hero with mesh loaded from JSON file
-        //THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
-        //var loader = new THREE.JSONLoader();
-        //var onJSONLoaded = function ( geometry, materials ) {
-        //    hero = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-        //    hero.geometry.applyMatrix( XXX TODO XXX );
-        //    scene.add( hero );
-		//}
-        //loader.load( 'obj/male02/Male02_dds.js', onJSONLoaded);
+        THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+        var loader = new THREE.JSONLoader();
+        var onJSONLoaded = function ( geometry, materials ) {
+            hero.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+            //hero.mesh.scale.set(0.01,0.01,0.01);
+            var mat = new THREE.Matrix4(), mat0= new THREE.Matrix4(),mat1=new THREE.Matrix4();
+            
+            mat0.makeRotationZ(degToRad(180));
+            mat1.makeRotationX(degToRad(90));
+            mat.multiplyMatrices(mat0,mat1);  
+            mat.scale(new THREE.Vector3(0.01,0.01,0.01));
+            mat.setPosition(new THREE.Vector3(0.5,0.5,0));
+           // mat.makeTranslation(5,5,0);
+            console.log(mat.getPosition());
+            hero.mesh.geometry.applyMatrix(mat);
+            hero.mesh.position.set(hero.position.x, hero.position.y, 0);
+            hero.mesh.rotation.set(0,0,degToRad(hero.position.az),"ZXY");
+            glob_scene.scene.add( hero.mesh );
+		}
+        loader.load( 'obj/male02/Male02_dds.js', onJSONLoaded);
 
 
 

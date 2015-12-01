@@ -50,7 +50,7 @@ gulp.task('connectPart1',function(){
 	});
 });
 
-gulp.task('watchPart1',[],function(){
+gulp.task('watchPart1',function(){
 	gulp.watch(['maze/js/main.js','maze/css/main.css','maze/index.html'],browserSync.reload);
 });
 
