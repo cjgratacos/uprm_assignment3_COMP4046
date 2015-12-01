@@ -1,0 +1,13 @@
+@import "./variables"
+
+br(rd = 5px)
+	-webkit-border-radius rd
+	border-radius rd
+	
+position-margin(padlvl,val)
+	margin padlvl
+	if val is 'left'
+		float left
+	if val is 'right'
+		float right
+	

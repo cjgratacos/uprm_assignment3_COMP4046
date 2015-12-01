@@ -1,0 +1,13 @@
+body {
+  background-color: #fafafa;
+}
+h1 {
+  color: #009688;
+}
+div {
+  border: width 1px #757575;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  margin: 5%;
+  float: left;
+}
