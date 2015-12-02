@@ -1,17 +1,22 @@
 "use strict";
+/*
+    Carlos Gratacos
+    COMP4046
+    UPRM2015S1
+    Prof. Remi Megret
+    Assignment #3 :3D Graphics Project
+    Part 1 : Setting a basic template
+*/
+
 /* global doubleTimesSum */
 /* global hero */
 /* global degToRad */
 /* global messagebox */
 /* global THREE */
 /* global dat */
-//Imediately invoke function for modularization and conflict prevention
+//Imediately invoke function (IIF) for modularization and Global populating conflict prevention
 
 (function(window){
-    //Debug Mode Object
-    var debug_mode ={
-        tileTest:false
-    };
 
     //Global Variables
     var gui;
@@ -61,7 +66,7 @@
         'el0': 30.0,
         'd0' : 8.0
     };
-    
+ //Function that initiates the GUI
     function initGUI() {
         gui = new dat.GUI({ autoPlace: true })
 
@@ -69,23 +74,24 @@
         gui.add(params, 'el0').min(-90).max(+90).listen();
         gui.add(params, 'd0').min(+1).max(+100).listen();
     }
-//Mouse Event
+//Mouse Event Handler Function initiator
     function initMouse(canvas) {
         canvas.onmousemove = handleMouseMove;
         canvas.onmousedown = handleMouseDown;
         canvas.onmouseleave = function() {glob_mouse.mouseState = 0; glob_mouse.mouse.x=0; glob_mouse.mouse.y=0};
     }
-        function handleMouseDown(event) {
+//Mouse Down event handler: Transform cordinate to canvas coordinate    
+    function handleMouseDown(event) {
         // Get mouse position in normalized coordinates [-1, +1]
         var rect = event.target.getBoundingClientRect()
-        glob_mouse.mouse.x = (event.clientX - rect.left) / (rect.right-rect.left) * 2 - 1
-        glob_mouse.mouse.y = -(event.clientY - rect.top) / (rect.bottom-rect.top) * 2 + 1
-        console.log(glob_mouse.mouse)
+        glob_mouse.mouse.x = (event.clientX - rect.left) / (rect.right-rect.left) * 2 - 1;
+        glob_mouse.mouse.y = -(event.clientY - rect.top) / (rect.bottom-rect.top) * 2 + 1;
     }
+//Mouse Move handler function: Empty due that I choose the route to make personal project
     function handleMouseMove(event) {
     }
     
-// Keyboard Event
+// Keyboard Event Initiator Handler
     function initKeyboard(canvas, onKeyDown, onKeyUp) {
         // add tabindex attribute to canvas to allow it getting keyboard focus
         // Same as declaring <canvas tag='webgl-canvas' tabindex='1'></canvas> in HTML
@@ -94,18 +100,18 @@
         // to improve user experience by handling keyboard out of the box
         canvas.focus();
         canvas.onmouseenter = (function () {canvas.focus()});
-        //canvas.onmouseleave = (function () {canvas.blur()});
         
         canvas.onkeydown = handleKeyDown;
         canvas.onkeyup = handleKeyUp;
     }
     
-        function handleKeyDown(event) {
+    //Function that handlers the keydown event
+    function handleKeyDown(event) {
         var keyCode = event.keyCode;
         currentlyPressedKeys[keyCode] = true;
         
         // Display pressed keys for debugging. Comment if too verbose
-        console.log('KeyDown: keycode = '+keyCode.toString());
+        //console.log('KeyDown: keycode = '+keyCode.toString());
         
         if (keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40) {
             // Arrow keys: prevent default handling (i.e. avoid scrolling)
@@ -123,11 +129,11 @@
             // Check victory
         }
     }
-    
+    //function that handlers the keyup event
     function handleKeyUp(event) {
         currentlyPressedKeys[event.keyCode] = false;
     }
-    
+    //function that handlers key events
     function handleKeys() {
         /* Camera 0 controls */
         if (currentlyPressedKeys[73] /* I */) { params.el0 += 2 }
@@ -160,16 +166,28 @@
     }
         
 // Animation
+    //Function that process the animation
     function animate() {
         var timeNow = new Date().getTime();
         if (glob_animate.lastTime != 0) { glob_animate.elapsed = (timeNow - glob_animate.lastTime)/1000; }
         glob_animate.lastTime = timeNow;
         
         /* Hero collision detection */
-        var d2 = doubleTimesSum(hero.motion.dx,doubleTimesSum(hero.motion.dy));
+        var d2 = doubleTimesSum(hero.motion.dx,hero.motion.dy);
+        //Detection Collision
         if (d2>0) {
             // If we are moving, check for collisions
-            // TODO
+            var position = new THREE.Vector3(hero.position.x,hero.position.y,0.5);
+            var direction = new THREE.Vector3(hero.motion.dx,hero.motion.dy,0);
+            var raycaster = new THREE.Raycaster(position, direction, 0, 1);
+            var intersects = raycaster.intersectObject( glob_scene.wallMesh,true );
+            //console.log(intersects.length);
+            if (intersects.length > 0 && intersects[0].distance < 10) {
+                //Intersection with wall, stop movement completely
+                console.log(intersects.length);
+                hero.motion.dx = hero.motion.dy = 0;
+            }
+            
         }
         
         /* Update Hero Position */
@@ -187,8 +205,8 @@
         var az0 = params.az0, el0 = params.el0, d0 = params.d0
         
         // Uncomment to look at maze center instead of origin
-        //var target = new THREE.Vector3(maze.w/2,maze.h/2,0)
-        var target = new THREE.Vector3(0,0,0)
+        var target = new THREE.Vector3(plane_dimension.w/2,plane_dimension.h/2,0)
+        //var target = new THREE.Vector3(0,0,0)
         glob_scene.cameras[0].position.set(
                 target.x-d0*Math.cos(degToRad(el0))*Math.sin(degToRad(az0)),
                 target.y-d0*Math.cos(degToRad(el0))*Math.cos(degToRad(az0)),
@@ -202,18 +220,18 @@
         // Euler angles in ZXY order:
         // First rotate az degrees around Z for the direction, then
         // rotate 90 deg around X to get the direction Z_camera pointing backward
-        glob_scene.cameras[1].rotation.set(degToRad(90),0,degToRad(hero.position.az),"ZXY") 
+        glob_scene.cameras[1].rotation.set(degToRad(90),0,degToRad(hero.position.az),"ZXY");
         glob_scene.cameras[1].updateMatrixWorld();
         glob_scene.camerasHelpers[1].update();
     }
-    
+    //function that is called asynchronously in an interval of time to create the ilusion of animation
     function tick() {
         requestAnimationFrame(tick);
         handleKeys();
         animate();
         glob_scene.renderer.render(glob_scene.scene, glob_scene.camera);
     }
-
+    //creating the XY tiles, the floor
     var createXYTile = function(x,y,z,materialIndex) {
         var geometry =  new THREE.Geometry();
         
@@ -246,6 +264,7 @@
             );
         return geometry;
     }
+    //Creating the XZ tiles, the horizontal walls
     var createXZTile = function(x,y,z,materialIndex) {
         var geometry =  new THREE.Geometry();
         
@@ -278,6 +297,7 @@
             );
         return geometry;
     }
+    //Creating the YZ tiles, the horizontal walls
     var createYZTile = function(x,y,z,materialIndex) {
         var geometry =  new THREE.Geometry();
         
@@ -311,7 +331,8 @@
         return geometry;
     }
     
-    var createFloorGeometry = function(maze,materialCount) {
+    //Function for creating the floor
+    var createFloorGeometry = function(maze,materialCount) {//maze: Geometry Object representing the maze, materialCount: value of the max range of the list of material array that can access
         var geometry = maze;//new THREE.Geometry();
         
         for (var i = 0; i < plane_dimension.w; i++) {
@@ -320,25 +341,22 @@
             }
             
         }
-        // TODO
-        
-       // geometry.computeFaceNormals();
-        //geometry.computeVertexNormals();
         return geometry;
     }
-    var createWallGeometry = function(maze,materialCount) {
+    //Function for creating the wall
+    var createWallGeometry = function(maze,wallMaterialPosition) {//maze: Geometry Object representing the maze, wallMaterialPosition:  position of the wall image or material in the material array
         var geometry = maze;
         
+        //iterate to create  vertical wall
         for (var i = 0; i < plane_dimension.w; i++) {
-            geometry.merge(createXZTile(i,0,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
-            geometry.merge(createXZTile(i,plane_dimension.h,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
+            geometry.merge(createXZTile(i,0,0,0),new THREE.Matrix4(),wallMaterialPosition);
+            geometry.merge(createXZTile(i,plane_dimension.h,0,0),new THREE.Matrix4(),wallMaterialPosition);
         }
+        //iterate to create horizontal wall
         for (var i = 0; i < plane_dimension.h; i++) {
-            geometry.merge(createYZTile(0,i,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
-            geometry.merge(createYZTile(plane_dimension.w,i,0,0),new THREE.Matrix4(),getRandomInt(0,materialCount));
+            geometry.merge(createYZTile(0,i,0,0),new THREE.Matrix4(),wallMaterialPosition);
+            geometry.merge(createYZTile(plane_dimension.w,i,0,0),new THREE.Matrix4(),wallMaterialPosition);
         }
-        // TODO
-        
         return geometry;
     }
 
@@ -396,9 +414,9 @@
     
         
         /* Load textures and create materials */
-        
+        //PART 1- H5
         var texs = [], materials = [],multimaterial;
-        texs.push(THREE.ImageUtils.loadTexture("textures/crateUV.jpg"));
+        texs.push(THREE.ImageUtils.loadTexture("textures/crate.jpg"));
         texs.push(THREE.ImageUtils.loadTexture( "textures/crateUV.jpg" ));
         texs.push(THREE.ImageUtils.loadTexture( "textures/floor1.png" ));
         texs.push(THREE.ImageUtils.loadTexture( "textures/brick-c.jpg " ));
@@ -417,8 +435,9 @@
         
         // TODO: replace uniform color by crateUV texture
         
-        material = new THREE.MeshPhongMaterial( {map: texs[0], side:THREE.DoubleSide } );
         
+        //Commented due to unnecesary features
+        //PART 1- H1-H2
         //material = new THREE.MeshPhongMaterial( {color: 0xff0000} ); 
         //
         //
@@ -436,16 +455,22 @@
         //glob_scene.tileMesh = new THREE.Mesh( geometry, material ); 
         //glob_scene.scene.add(glob_scene.tileMesh)
         
+        
+        //PART 1- H3-H4
+         material = new THREE.MeshPhongMaterial( {map: texs[0], side:THREE.DoubleSide } );
         // TODO: complete createFloorGeometry function
-         geometry = createFloorGeometry(new THREE.Geometry(),texs.length);
+         geometry = createFloorGeometry(new THREE.Geometry(),texs.length-1);
          glob_scene.floorMeshmesh = new THREE.Mesh( geometry, multimaterial );
          glob_scene.scene.add( glob_scene.floorMeshmesh );
         
         // TODO: complete createWallGeometry function    
-        geometry = createWallGeometry(geometry,texs.length);
+        geometry = createWallGeometry(geometry,texs.length-1);
         glob_scene.wallMesh = new THREE.Mesh( geometry, multimaterial );
         glob_scene.scene.add( glob_scene.wallMesh );
         
+        
+        
+        //Commented due to unnecesary features
         // Helper to see the walls from cameras[2] top view
         //wire = new THREE.WireframeHelper( wallMesh, 0x0000ff );
         //wire.material.linewidth = 3
@@ -453,32 +478,35 @@
         
         
         /* Create hero mesh */
-
-        hero.position.x = hero.position.y = 0;
-        
+         //Commented due to unnecesary features
         //geometry = new THREE.BoxGeometry(0.5,0.3,0.6);
         //geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,0.3));
         //geometry.merge( new THREE.SphereGeometry(0.2,20,20), new THREE.Matrix4().makeTranslation(0,0,0.8), 0 );
         //material = new THREE.MeshPhongMaterial( {color: 0xff0000} ); 
         //hero.mesh = new THREE.Mesh( geometry, material ); 
         //glob_scene.scene.add( hero.mesh );
-
+        //PART 1- H6
+         hero.position.x = hero.position.y = 0.5;
         // TODO: replace box and sphere hero with mesh loaded from JSON file
         THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
         var loader = new THREE.JSONLoader();
         var onJSONLoaded = function ( geometry, materials ) {
+            //Assigning to the hero (character object) the mesh from the loaded dds
             hero.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-            //hero.mesh.scale.set(0.01,0.01,0.01);
-            var mat = new THREE.Matrix4(), mat0= new THREE.Matrix4(),mat1=new THREE.Matrix4();
-            
-            mat0.makeRotationZ(degToRad(180));
-            mat1.makeRotationX(degToRad(90));
-            mat.multiplyMatrices(mat0,mat1);  
-            mat.scale(new THREE.Vector3(0.01,0.01,0.01));
-            mat.setPosition(new THREE.Vector3(0.5,0.5,0));
-           // mat.makeTranslation(5,5,0);
-            console.log(mat.getPosition());
-            hero.mesh.geometry.applyMatrix(mat);
+            //initializing matrixes
+            //var mat = new THREE.Matrix4(), mat0= new THREE.Matrix4(),mat1=new THREE.Matrix4();
+            //Steps for making the object appear in the right position
+            hero.mesh.geometry.applyMatrix((new THREE.Matrix4()).makeTranslation(0,0,0));
+            hero.mesh.geometry.applyMatrix((new THREE.Matrix4()).scale(new THREE.Vector3(0.01,0.01,0.01)));
+            hero.mesh.geometry.applyMatrix((new THREE.Matrix4()).makeRotationY(degToRad(180)));
+            hero.mesh.geometry.applyMatrix((new THREE.Matrix4()).makeRotationX(degToRad(90)));           
+            //mat0.makeRotationZ(degToRad(180));
+            //mat1.makeRotationX(degToRad(90));
+            //mat.multiplyMatrices(mat0,mat1);  
+            //mat.scale(new THREE.Vector3(0.01,0.01,0.01));
+            //mat.setPosition(new THREE.Vector3(0.5,0.5,0));
+            //applying the matrix object
+            //hero.mesh.geometry.applyMatrix(mat);
             hero.mesh.position.set(hero.position.x, hero.position.y, 0);
             hero.mesh.rotation.set(0,0,degToRad(hero.position.az),"ZXY");
             glob_scene.scene.add( hero.mesh );
@@ -502,7 +530,7 @@
 
         
         /* Create Controllers */
-        
+        //Initiate Handlers & Controllers
         initMouse(canvas);
         initKeyboard(canvas);
         initGUI()
@@ -511,5 +539,7 @@
         tick();
     }
 
+    //Only exposing the function webGLStart to the outer world, everything else will be unaccesable by the outer world;
     window.webGLStart = webGLStart;
-})(window);
+    
+})(window); //Passing the window object 

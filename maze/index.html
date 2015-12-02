@@ -5,6 +5,8 @@
 <title>Maze project</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
+<link href="./css/concise.css" rel="stylesheet">
+<link href="./css/main.css" rel="stylesheet">
 <!-- <script type="text/javascript" src="js/three.js"></script> -->
 <script type="text/javascript" src="js/three.min.js"></script>
 
@@ -26,14 +28,38 @@
 
 <body onload="webGLStart();">
 
-    <canvas id="canvas" width="512" height="512"></canvas>
-    <br/>
-    <div id="messagebox">---</div>
-    <div>Memo:<br>cameras[0] controls: IJKL for elevation/azimuth, UO for distance to target
-    <br>Hero/cameras[1] controls: arrow keys
-    <br>cameras[2] controls: none
-    <br>Switch between cameras using 'V'</div>
-    
+    <header>
+        <nav>
+            <h1>Assignment 3: Maze Project</h1>
+            <p class="left-padding">Carlos Gratacos, COMP4046, UPRM 2015S1</p>
+           
+        </nav>
+    </header>
+    <div id="main">
+        <div class="row-block">
+            <div class="column-block">
+                 <canvas class="canvas" id="canvas" width="512" height="512"></canvas>
+                <div id="messagebox">---</div>
+                <div>Memo:<br>cameras[0] controls: IJKL for elevation/azimuth, UO for distance to target
+                <br>Hero/cameras[1] controls: arrow keys
+                <br>cameras[2] controls: none
+                <br>Switch between cameras using 'V'</div>   
+            </div>
+         </div>
+         <div class="panel ">
+             <p>
+                 <h4>Instructions</h4>
+             </p>
+             <p>
+                 This project satisfies the requirements of Assignment #3 Part 1, it is a demonstration and proof of concepts.
+                 You can camera using the controllers, and the person object with the arrow key, it also detects collision using raycasters.
+                 In other words you cannot pass trought the wall.
+                 <br/>
+                 The Floor is randomly generated each time is loaded.
+                 for more information read the <a href="./js/main.js">main.js</a> file.
+             </p>
+         </div>
+    </div>
     <script src="./js/main.js" type="text/javascript"></script>
 </body>
 
