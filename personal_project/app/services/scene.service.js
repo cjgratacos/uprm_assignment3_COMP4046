@@ -5,7 +5,8 @@
 	
 	Scene.factory('SceneFactory',function(){
 		var sceneGlob = {
-			
+			render:false,
+			animation:false
 		};	
 		var tooltipPosition = {
 			r:-1,
@@ -14,6 +15,10 @@
 		};
 		
 			
-		return {};
+		return {
+			global:function(){
+				return sceneGlob;
+			}
+		};
 	});
 })();

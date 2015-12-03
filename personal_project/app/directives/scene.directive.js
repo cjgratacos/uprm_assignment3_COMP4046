@@ -4,9 +4,10 @@
 	var Canvas = angular.module('directive.scene',[]);
 	
 	
-	Canvas.run(function(UploaderService,HistogramFactory){
+	Canvas.run(function(UploaderService,HistogramFactory,SceneFactory){
 		uploaderService = UploaderService;
 		histogramFactory = HistogramFactory;
+		sceneService = SceneFactory;
 	});
 	
 	var canvasSize = {
@@ -21,8 +22,7 @@
 	var uid = "canvas"+idGenerator();
 	var uploaderService,sceneService,histogramFactory;
 	var canvas;
-	var imagePreviewCanvas,imagePreviewContext;
-	
+	var imagePreviewCanvas,imagePreviewContext; 
 	
 	var sceneGlob = {
 		camera: undefined,
@@ -31,41 +31,48 @@
 		control:undefined
 	};
 	
-	function init(){
-		imagePreviewContext = imagePreviewCanvas.getContext("2d");
-		var imageData = imagePreviewContext.getImageData(0,0,imagePreviewCanvas.width,imagePreviewCanvas.height);
-		console.log(imageData);
-		histogramFactory.init(imagePreviewCanvas.width,imagePreviewCanvas.height,imageData);
-	}
-	
 	function initScene(){
 		sceneGlob.renderer = new THREE.WebGLRenderer({
 				'canvas': canvas, 
 				maxLights: 6, 
-				preserveDrawingBuffer: true,
+				preserveDrawingBuffer: true
 				//shadowMapEnabled: true 
 		});
-		sceneGlob.camera = new THREE.PerspectiveCamera(75,canvas.width/canvas.height,0.01,1000);
-		sceneGlob.camera.position.z = 500;
-		sceneGlob.camera.position.y = -500;
-		sceneGlob.camera.rotation.x = .75;
+		sceneGlob.camera = new THREE.PerspectiveCamera(35,canvas.width/canvas.height,0.01,1000);
+		sceneGlob.camera.position.z = 10;
+		sceneGlob.camera.position.y = 0;
+		sceneGlob.camera.rotation.x = 0;
 		sceneGlob.renderer.setClearColor(0x8f8f8f);
 		sceneGlob.scene = new THREE.Scene();
-		//sceneGlob.controls = new THREE.TrackballControls( sceneGlob.camera );
-		//sceneGlob.controls.rotateSpeed = 1.0;
-		//sceneGlob.controls.zoomSpeed = 1.2;
-		//sceneGlob.controls.panSpeed = 0.8;
-		//sceneGlob.controls.noZoom = false;
-		//sceneGlob.controls.noPan = false;
-		//sceneGlob.controls.staticMoving = true;
-		// dsceneGlob.controls.dynamicDampingFactor = 0.3;
-		sceneGlob.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(300,300),new THREE.MeshNormalMaterial()));
+		histogramFactory.createBox({
+			showBox:true,
+			cornerShape:"sphere"
+		},sceneGlob.scene);
 		sceneGlob.scene.add( new THREE.AmbientLight( 0x808080 ) );
 		var light = new THREE.SpotLight( 0xffffff, 1.5 );
 		light.position.set( 0, 500, 2000 );
 		sceneGlob.scene.add( light );
 		sceneGlob.renderer.render(sceneGlob.scene,sceneGlob.camera);
+		tick();
 	}
+	function tick() {
+		requestAnimationFrame(tick);
+		//handleKeys();
+		sceneRenderer();
+		sceneGlob.renderer.render(sceneGlob.scene, sceneGlob.camera);
+	}
+	function sceneRenderer(){
+		if(sceneService.global().render){
+			histogramFactory
+			.createObjects({
+				style:"ball",
+				wireframe:true,
+				selectColor:false
+			},sceneGlob.scene)
+			sceneService.global().render = false;
+		}
+	}
+	
 	
 	
 	var canvasModule = function(){
@@ -85,11 +92,10 @@
 			uploaderService.registerCallback({
 				category:'canvasscene',
 				callback:function(image){
-					setTimeout(function() {
-						init();
-					}, 10);
-					//canvasContext.clearRect(0,0,canvasSize.width,canvasSize.height);
-					//canvasContext.drawImage(image,0,0,canvasSize.width,canvasSize.height);
+					imagePreviewContext = imagePreviewCanvas.getContext("2d");
+					var imageData = imagePreviewContext.getImageData(0,0,imagePreviewCanvas.width,imagePreviewCanvas.height);
+					histogramFactory.init(imagePreviewCanvas.width,imagePreviewCanvas.height,imageData);
+					sceneService.global().render =true;
 				}
 			});
 		
@@ -101,7 +107,6 @@
 			},
 			template:template,
 			link:link,
-			
 		};
 	}
 	

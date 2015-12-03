@@ -22,7 +22,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 (function(){
 	var App = angular.module('histogram-app',[
 	/*Dependencies*/	'lumx','rzModule',
-	/*Services*/		'service.uploader','service.histogram',
+	/*Services*/		'service.uploader','service.histogram','service.scene',
 	/*Directives*/		'directive.canvas','directive.canvas.history','directive.toolbar','directive.scene'
 		]);
 	
