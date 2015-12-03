@@ -3,39 +3,37 @@
 (function(){
 	var Canvas = angular.module('directive.canvas',[]);
 	
-	var idGenerator = function(){
-		return Math.random().toString(36).slice(2);
-	}
 	
-	var uid = "canvas"+idGenerator();
+	Canvas.run(function(UploaderService){
+		uploaderService=UploaderService;
+	});
 	var context = null;
 	var canvasSize = {
 		height:370,
 		width:360
 	};
+	var uploaderService;
 	
-
 	var canvasModule = function(){
-		var template = "<canvas class='card' id='"+uid+"' height='"+canvasSize.height+"' width='"+canvasSize.width+"'></canvas>";
+		var template = "<div flex-container='column'><div class='ml+ mb'><span class='fs-display-1 display-block'>{{title}}</span></div><div flex-container='row' class='ml'><canvas class='card' id='imagePreview' height='"+canvasSize.height+"' width='"+canvasSize.width+"'></canvas></div></div>";
 		
 		var link = function(scope,elements,attributes){
-			context = angular.element("#"+uid)[0].getContext("2d");
-			var uploader = scope.uploaderFunc();
-			uploader.registerCallback({
+			scope.title= "Image View";
+			context = angular.element("#imagePreview")[0].getContext("2d");
+			
+			uploaderService.registerCallback({
 				category:'imagecanvas',
 				callback:function(image){
 					context.clearRect(0,0,canvasSize.width,canvasSize.height);
 					context.drawImage(image,0,0,canvasSize.width,canvasSize.height);
 				}
 			});
-			
+			scope.imageWidth = 0, scope.imageHeight = 0;
 			
 		};
 		return {
 			restrict:"E",
 			scope:{
-				uploaderFunc:"&",
-				tooltipFunc:"&"
 			},
 			link:link,
 			template:template

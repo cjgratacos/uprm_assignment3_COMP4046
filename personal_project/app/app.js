@@ -21,9 +21,9 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(){
 	var App = angular.module('histogram-app',[
-	/*Dependencies*/	'lumx',
-	/*Services*/		'service.uploader',
-	/*Directives*/		'directive.canvas','directive.canvas.history'
+	/*Dependencies*/	'lumx','rzModule',
+	/*Services*/		'service.uploader','service.histogram',
+	/*Directives*/		'directive.canvas','directive.canvas.history','directive.toolbar','directive.scene'
 		]);
 	
 	App.constant('INFORMATION',{
@@ -39,6 +39,8 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 	App.controller('mainController',function($scope, $document,LxNotificationService,UploaderService,SETTING){
 		//console.log($document.find("#canvas").append());
 		$scope.settings = SETTING;
+		$scope.uploadTitle = "Image Uploader";
+		$scope.uploadLabel = "Just Click Here to Browse Pictures... ";
 		$scope.components ={
 			img: new Image()
 		};

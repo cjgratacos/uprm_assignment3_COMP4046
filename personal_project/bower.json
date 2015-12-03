@@ -26,6 +26,7 @@
     "Chart.js": "~1.0.2",
     "angular-ui-grid": "ui-grid#~3.0.7",
     "angular-file-upload": "~2.2.0",
-    "polymer": "Polymer/polymer#^1.2.0"
+    "polymer": "Polymer/polymer#^1.2.0",
+    "angularjs-slider": "~2.1.0"
   }
 }
