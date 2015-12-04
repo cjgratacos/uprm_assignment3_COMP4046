@@ -14,40 +14,54 @@ SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
+/*
+Carlos Gratacos
+COMP4046 UPRM15S1
+3D Histogram Wen App
+The purpose of this proyect is to bring two complex library (AngularJS and ThreeJS) and create a user friendly,
+modern looking Web Application, that follows modern styles of developments.
+External Sources:
+Angular JS, Lumx, MomentJS, OrbitControls,rzslider,Threejs,velocityjs
 
+This application uses Modules,Directives and Factories based on Angular Standards
 
-
+Github: Soon
+*/
 "use strict";
-
+//Initiator Function This is the Main Module
 (function(){
-	var App = angular.module('histogram-app',[
+	var App = angular.module('histogram-app',[//Loading all modules dependencies
 	/*Dependencies*/	'lumx','rzModule',
-	/*Services*/		'service.uploader','service.histogram','service.scene',
+	/*Services*/		'service.uploader','service.histogram','service.scene','service.toolbar',
 	/*Directives*/		'directive.canvas','directive.canvas.history','directive.toolbar','directive.scene'
 		]);
-	
+	//Default Constans shared around the App
 	App.constant('INFORMATION',{
 		author:'Carlos Gratacos',
 		appName:'3D Histogram App',
 		version:"1.0.0"
 	});
 	App.constant('SETTING',{
-		debugMode:false,
-		maxHistory:5,
+		debugMode:false,//Debug mode
+		maxHistory:5,//Image History max range
 	});
 	
-	App.controller('mainController',function($scope, $document,LxNotificationService,UploaderService,SETTING){
+	//Main Controller Initializes the main components
+	App.controller('mainController',function($scope, $document,LxNotificationService,UploaderService,SETTING){//Dependecy Injection on providers 
 		//console.log($document.find("#canvas").append());
+		//Basic $scope variables
 		$scope.settings = SETTING;
 		$scope.uploadTitle = "Image Uploader";
 		$scope.uploadLabel = "Just Click Here to Browse Pictures... ";
 		$scope.components ={
 			img: new Image()
 		};
+		//Function to pass around the Uploader Service between Directives
 		$scope.UploaderServiceGetter = function(){
 			return UploaderService;
 		}
 		
+		//ImageUploader Sanitizer result, it tells the user that the file trying to be used is not an image 
 		$scope.uploadImg = function(img){
 			console.log(img);
 			UploaderService.upload(img,null,function(result){

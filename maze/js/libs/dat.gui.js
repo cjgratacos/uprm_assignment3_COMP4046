@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui

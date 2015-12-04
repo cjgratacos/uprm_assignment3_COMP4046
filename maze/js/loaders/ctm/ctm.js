@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
+/*
 Copyright (c) 2011 Juan Mellado
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

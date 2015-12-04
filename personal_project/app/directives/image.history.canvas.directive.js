@@ -1,5 +1,10 @@
-"use strict";
+/*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
 
+"use strict";
+//This Module is in charge of managing and processing the images history
 (function(){
 
 	var CanvasHistory = angular.module('directive.canvas.history',[]);

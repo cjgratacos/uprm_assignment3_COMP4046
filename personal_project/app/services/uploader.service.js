@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 "use strict";
 
+//Service incharge of the uploading process
 (function(){
 	var Uploader = angular.module('service.uploader',[]);
 

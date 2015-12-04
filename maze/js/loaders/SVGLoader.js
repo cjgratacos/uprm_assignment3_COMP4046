@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author zz85 / http://joshuakoo.com/

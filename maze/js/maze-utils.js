@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Joe Martella All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 
 function degToRad(degrees) {
     return degrees * Math.PI / 180;
